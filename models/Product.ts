@@ -1,0 +1,237 @@
+// models/Product.ts
+import mongoose from 'mongoose';
+
+const productSchema = new mongoose.Schema({
+  // Basic Info
+  vendorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  slug: {
+    type: String,
+    unique: true,
+    lowercase: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  shortDescription: String,
+
+  // Product Type
+  productType: {
+    type: String,
+    enum: ['digital', 'website'],
+    default: 'digital',
+    index: true
+  },
+
+  // Categories (Digital + Website specific)
+  category: {
+    type: String,
+    required: true,
+    enum: [
+      // Digital categories
+      'templates', 'software', 'ebooks', 'graphics', 'music', 'videos', 'courses', 'plugins', 'themes',
+      // Website categories
+      'ecommerce', 'blog', 'portfolio', 'business', 'education', 'restaurant', 'realestate', 'healthcare', 'travel', 'fashion', 'technology', 'entertainment',
+      'other'
+    ],
+    index: true
+  },
+  subCategory: String,
+  websiteType: {
+    type: String,
+    enum: ['static', 'dynamic', 'single-page', 'multi-page', 'full-stack'],
+    default: null
+  },
+  tags: [String],
+
+  // Pricing
+  price: {
+    type: Number,
+    required: true
+  },
+  salePrice: Number,
+  currency: {
+    type: String,
+    default: 'USD'
+  },
+  discountPercent: {
+    type: Number,
+    default: 0
+  },
+
+  // Files
+  fileUrl: {
+    type: String,
+    required: true
+  },
+  fileId: String,
+  fileSize: String,
+  fileFormat: String,
+  thumbnailUrl: String,
+  thumbnailId: String,
+  previewImages: [{
+    url: String,
+    id: String
+  }],
+  demoUrl: String,
+  videoUrl: String,
+
+  // Details
+  features: [String],
+  requirements: [String],
+  documentation: String,
+  version: {
+    type: String,
+    default: '1.0.0'
+  },
+  technologies: [String],
+  pages: [String],
+  includes: [String],
+  supportIncluded: {
+    type: Boolean,
+    default: false
+  },
+  supportDuration: String,
+  updatesIncluded: {
+    type: Boolean,
+    default: false
+  },
+
+  // Stats
+  views: {
+    type: Number,
+    default: 0
+  },
+  downloads: {
+    type: Number,
+    default: 0
+  },
+  sales: {
+    type: Number,
+    default: 0
+  },
+  revenue: {
+    type: Number,
+    default: 0
+  },
+
+  // Ratings
+  averageRating: {
+    type: Number,
+    default: 0
+  },
+  totalReviews: {
+    type: Number,
+    default: 0
+  },
+  ratingBreakdown: {
+    1: { type: Number, default: 0 },
+    2: { type: Number, default: 0 },
+    3: { type: Number, default: 0 },
+    4: { type: Number, default: 0 },
+    5: { type: Number, default: 0 }
+  },
+
+  // Premium & Verification
+  isVerified: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  isPremium: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  isAdsenseApproved: {
+    type: Boolean,
+    default: false
+  },
+  isBestSeller: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  isFeatured: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  isTrending: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  isNew: {
+    type: Boolean,
+    default: true
+  },
+
+  // Status
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected', 'archived'],
+    default: 'pending',
+    index: true
+  },
+  rejectionReason: String,
+  approvedAt: Date,
+  approvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+
+  // SEO
+  metaTitle: String,
+  metaDescription: String,
+  keywords: [String],
+
+  // Settings
+  allowComments: {
+    type: Boolean,
+    default: true
+  },
+  lastUpdated: Date
+}, {
+  timestamps: true,
+  suppressReservedKeysWarning: true
+});
+
+// Pre-save hook
+productSchema.pre('save', function() {
+  const product = this as any;
+  
+  if (product.isModified('title')) {
+    product.slug = product.title.toLowerCase().replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-');
+  }
+  
+  product.updatedAt = new Date();
+});
+
+// Indexes
+productSchema.index({ title: 'text', description: 'text', tags: 'text' });
+productSchema.index({ vendorId: 1, status: 1 });
+productSchema.index({ category: 1, status: 1, productType: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ averageRating: -1 });
+productSchema.index({ sales: -1 });
+productSchema.index({ views: -1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ isFeatured: 1, status: 1 });
+productSchema.index({ isBestSeller: 1, status: 1 });
+productSchema.index({ isVerified: 1, status: 1 });
+productSchema.index({ isPremium: 1, status: 1 });
+productSchema.index({ productType: 1, status: 1 });
+
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+
+export default Product;
