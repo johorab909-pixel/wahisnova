@@ -10,23 +10,12 @@ import {
   Wallet,
   Download,
   Clock,
-  CheckCircle,
-  XCircle,
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-  ArrowUpRight,
-  ArrowDownRight,
-  Calendar,
-  Package,
-  ShoppingCart,
-  X,
   Smartphone,
   Landmark,
-  User,
+  Calendar,
+  X,
   Search,
-  Filter,
-  FileText
+  Loader2
 } from 'lucide-react';
 
 interface EarningTransaction {
@@ -66,8 +55,8 @@ export default function VendorEarningsPage() {
   // Summary state
   const [summary, setSummary] = useState({
     totalEarnings: 0,
-    pendingIncome: 0,        // ✅ Add
-    pendingWithdrawal: 0,    // ✅ Add
+    pendingIncome: 0,        
+    pendingWithdrawal: 0,    
     withdrawnEarnings: 0,
     availableBalance: 0,
     totalOrders: 0,
@@ -77,7 +66,7 @@ export default function VendorEarningsPage() {
   // Filter state
   const [activeTab, setActiveTab] = useState<'earnings' | 'withdrawals'>('earnings');
   const [filterStatus, setFilterStatus] = useState<'all' | 'paid' | 'pending'>('all');
-const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year' | 'all' | 'custom'>('30days');
+  const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year' | 'all' | 'custom'>('30days');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [search, setSearch] = useState('');
@@ -112,8 +101,8 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
       }
       
       const [earningsResponse, withdrawalsResponse] = await Promise.all([
-        axios.get('/api/orders/vendor-orders', { params }),
-        axios.get('/api/withdrawal/history', { params: { page: 1, limit: 10 } })
+        axios.get('/api/orders/vendor-orders', { params, withCredentials: true }),
+        axios.get('/api/withdrawal/history', { params: { page: 1, limit: 10 }, withCredentials: true })
       ]);
       
       if (earningsResponse.data.success) {
@@ -122,16 +111,7 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
         setTotalPages(earningsResponse.data.data.pagination.totalPages);
         setTotalTransactions(earningsResponse.data.data.pagination.total);
         
-        // Calculate summary
         const paidOrders = orders.filter((o: any) => o.paymentStatus === 'paid');
-        const pendingOrders = orders.filter((o: any) => o.paymentStatus === 'pending');
-        
-        const totalEarned = paidOrders.reduce((sum: number, o: any) => sum + o.vendorAmount, 0);
-        const pendingEarned = pendingOrders.reduce((sum: number, o: any) => sum + o.vendorAmount, 0);
-        
-// Summary calculation change করুন
-
-        const availableBalance = (user?.totalEarnings || 0) - (user?.pendingWithdrawal || 0);
 
         setSummary({
           totalEarnings: user?.totalEarnings || 0,
@@ -146,8 +126,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
           totalOrders: orders.length,
           totalSales: paidOrders.length
         });
-
-
       }
       
       if (withdrawalsResponse.data.success) {
@@ -173,7 +151,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
   };
 
   const handleWithdrawSubmit = async () => {
-    // Validation
     const newErrors: {[key: string]: string} = {};
     
     if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) {
@@ -205,7 +182,7 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
         method: withdrawMethod,
         accountNumber,
         accountHolderName
-      });
+      }, { withCredentials: true });
       
       if (response.data.success) {
         toast.success('Withdrawal request submitted!');
@@ -285,7 +262,7 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
           <p className="text-2xl font-bold text-gray-900">${summary.totalEarnings.toFixed(2)}</p>
           <p className="text-sm text-gray-500 mt-1">Total Earned</p>
         </div>
-        {/* Pending Income Card */}
+
         <div className="bg-white rounded-xl shadow-sm p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
@@ -296,17 +273,17 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
           <p className="text-2xl font-bold text-gray-900">${summary.pendingIncome.toFixed(2)}</p>
           <p className="text-sm text-gray-500 mt-1">Awaiting Verification</p>
         </div>
-        {/* Pending Withdrawal Card */}
-      <div className="bg-white rounded-xl shadow-sm p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
-            <Download className="w-5 h-5 text-orange-600" />
+
+        <div className="bg-white rounded-xl shadow-sm p-5">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
+              <Download className="w-5 h-5 text-orange-600" />
+            </div>
+            <span className="text-xs text-gray-400">Withdrawal</span>
           </div>
-          <span className="text-xs text-gray-400">Withdrawal</span>
+          <p className="text-2xl font-bold text-gray-900">${summary.pendingWithdrawal.toFixed(2)}</p>
+          <p className="text-sm text-gray-500 mt-1">Pending Withdrawal</p>
         </div>
-        <p className="text-2xl font-bold text-gray-900">${summary.pendingWithdrawal.toFixed(2)}</p>
-        <p className="text-sm text-gray-500 mt-1">Pending Withdrawal</p>
-      </div>
 
         <div className="bg-white rounded-xl shadow-sm p-5">
           <div className="flex items-center gap-3 mb-3">
@@ -355,7 +332,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
       {/* ============ FILTERS ============ */}
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
         <div className="flex flex-col lg:flex-row gap-3">
-          {/* Search */}
           <form onSubmit={handleSearch} className="flex-1 flex gap-2">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -372,7 +348,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
             </button>
           </form>
 
-          {/* Date Range */}
           <div className="flex gap-1">
             {[
               { value: '7days', label: '7D' },
@@ -380,6 +355,7 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
               { value: '90days', label: '90D' },
               { value: 'year', label: 'Year' },
               { value: 'all', label: 'All' },
+              { value: 'custom', label: 'Custom' },
             ].map((item) => (
               <button
                 key={item.value}
@@ -398,7 +374,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
             ))}
           </div>
 
-          {/* Custom Date */}
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-gray-400" />
             <input
@@ -421,7 +396,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
             />
           </div>
 
-          {/* Status Filter */}
           <select
             value={filterStatus}
             onChange={(e) => {
@@ -435,7 +409,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
             <option value="pending">Pending</option>
           </select>
 
-          {/* Sort */}
           <select
             value={sortOrder}
             onChange={(e) => {
@@ -555,7 +528,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
             </div>
 
             <div className="p-6 space-y-4">
-              {/* Available Balance */}
               <div className="bg-indigo-50 p-4 rounded-lg text-center">
                 <p className="text-sm text-gray-600">Available Balance</p>
                 <p className="text-2xl font-bold text-indigo-600">
@@ -563,7 +535,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
                 </p>
               </div>
 
-              {/* Amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Amount *
@@ -585,7 +556,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
                 <p className="text-xs text-gray-400 mt-1">Minimum: $10</p>
               </div>
 
-              {/* Method */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Method *
@@ -609,7 +579,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
                 </div>
               </div>
 
-              {/* Account Number */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Account Number *
@@ -628,7 +597,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
                 )}
               </div>
 
-              {/* Account Holder Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Account Holder Name *
@@ -647,7 +615,6 @@ const [dateRange, setDateRange] = useState<'7days' | '30days' | '90days' | 'year
                 )}
               </div>
 
-              {/* Info Note */}
               <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-lg">
                 <Clock className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-yellow-700">
