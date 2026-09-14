@@ -28,8 +28,7 @@ export default function Footer() {
               Premium digital marketplace for buying and selling digital products, website templates, and creative assets.
             </p>
             <div className="flex gap-3">
-             
-             
+              
             </div>
           </div>
 
@@ -81,10 +80,10 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} Wahisnova. All rights reserved.
+            © 2026 Wahisnova. All rights reserved.
           </p>
           <p className="text-xs text-gray-500 flex items-center gap-1">
-            Made with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> by Wahisnova Team
+            Designed by Nazmus Sakib
           </p>
         </div>
       </div>
