@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Globe, 
   Mail,
@@ -18,9 +19,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                W
+            <Link href="/" className="flex items-center gap-2.5 mb-4">
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                <Image 
+                  src="/logo.png" 
+                  alt="Wahisnova Logo" 
+                  fill 
+                  className="object-contain"
+                />
               </div>
               <span className="text-xl font-bold">Wahisnova</span>
             </Link>

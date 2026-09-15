@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -14,13 +15,15 @@ export default function Navbar() {
   // UI state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
   
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
   
-  // ✅ Hide navbar on vendor/admin pages
+  // Hide navbar on vendor/admin pages
   const isDashboardPage = pathname.startsWith('/vendor') || pathname.startsWith('/admin');
   
   // Handle scroll for navbar shadow
@@ -33,11 +36,14 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  // Close user menu on outside click
+  // Close menus on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
+      }
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setIsMoreMenuOpen(false);
       }
     };
     
@@ -45,10 +51,11 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   
-  // Close mobile menu on route change
+  // Close mobile/dropdown menus on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
+    setIsMoreMenuOpen(false);
   }, [pathname]);
   
   // Handle search
@@ -85,7 +92,6 @@ export default function Navbar() {
     return '/dashboard';
   };
   
-  // ✅ If dashboard page, don't show navbar
   if (isDashboardPage) {
     return null;
   }
@@ -105,22 +111,27 @@ export default function Navbar() {
       {/* Main navbar */}
       <nav className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-md group-hover:shadow-lg transition-shadow">
-                W
+          <div className="flex justify-between items-center h-20">
+            {/* Custom Logo */}
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center">
+                <Image 
+                  src="/logo.png" 
+                  alt="Wahisnova Logo" 
+                  fill 
+                  className="object-contain"
+                />
               </div>
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
                 Wahisnova
               </span>
             </Link>
             
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-5">
+            {/* Desktop Navigation - ফন্ট সাইজ বড় এবং মাঝখানে গ্যাপ বাড়িয়ে ফাঁকা ফাঁকা করা হয়েছে */}
+            <div className="hidden md:flex items-center gap-8 lg:gap-10">
               <Link 
                 href="/" 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-base font-semibold transition-colors ${
                   pathname === '/' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
                 }`}
               >
@@ -128,7 +139,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/digital-products" 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-base font-semibold transition-colors ${
                   pathname === '/digital-products' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
                 }`}
               >
@@ -136,25 +147,73 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/website-demos" 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-base font-semibold transition-colors ${
                   pathname === '/website-demos' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
                 }`}
               >
-                Website Demos
+                Website buy & sell
               </Link>
               <Link 
                 href="/categories" 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-base font-semibold transition-colors ${
                   pathname === '/categories' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
                 }`}
               >
                 Categories
               </Link>
               
+              {/* More Dropdown Menu */}
+              <div className="relative" ref={moreMenuRef}>
+                <button
+                  onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+                  className={`flex items-center gap-1.5 text-base font-semibold transition-colors ${
+                    ['/blog', '/about', '/contact'].includes(pathname)
+                      ? 'text-indigo-600'
+                      : 'text-gray-700 hover:text-indigo-600'
+                  }`}
+                >
+                  More
+                  <svg 
+                    className={`w-4 h-4 transition-transform ${isMoreMenuOpen ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {isMoreMenuOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
+                    <Link
+                      href="/blog"
+                      className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                      onClick={() => setIsMoreMenuOpen(false)}
+                    >
+                      📝 Blog
+                    </Link>
+                    <Link
+                      href="/about"
+                      className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                      onClick={() => setIsMoreMenuOpen(false)}
+                    >
+                      ℹ️ About Us
+                    </Link>
+                    <Link
+                      href="/contact"
+                      className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                      onClick={() => setIsMoreMenuOpen(false)}
+                    >
+                      📞 Contact Us
+                    </Link>
+                  </div>
+                )}
+              </div>
+              
               {isVendor && (
                 <Link 
                   href="/vendor/dashboard" 
-                  className={`text-sm font-medium transition-colors ${
+                  className={`text-base font-semibold transition-colors ${
                     pathname.startsWith('/vendor') ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
                   }`}
                 >
@@ -165,7 +224,7 @@ export default function Navbar() {
               {isAdmin && (
                 <Link 
                   href="/admin/dashboard" 
-                  className={`text-sm font-medium transition-colors ${
+                  className={`text-base font-semibold transition-colors ${
                     pathname.startsWith('/admin') ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
                   }`}
                 >
@@ -175,14 +234,14 @@ export default function Navbar() {
             </div>
             
             {/* Right side actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-3 sm:gap-4">
               {/* Search button */}
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className="p-2 text-gray-600 hover:text-indigo-600 transition-colors"
                 aria-label="Search"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
@@ -194,12 +253,12 @@ export default function Navbar() {
                     <div className="relative" ref={userMenuRef}>
                       <button
                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                        className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                        className="flex items-center gap-2.5 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
                       >
-                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
                           {getUserInitials()}
                         </div>
-                        <span className="hidden sm:block text-sm font-medium text-gray-700">
+                        <span className="hidden sm:block text-base font-semibold text-gray-700">
                           {user?.name?.split(' ')[0]}
                         </span>
                         <svg 
@@ -229,7 +288,7 @@ export default function Navbar() {
                           
                           <Link
                             href={getDashboardLink()}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             📊 Dashboard
@@ -238,7 +297,7 @@ export default function Navbar() {
                           {isVendor && (
                             <Link
                               href="/vendor/products/upload"
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                               onClick={() => setIsUserMenuOpen(false)}
                             >
                               📦 Upload Product
@@ -247,7 +306,7 @@ export default function Navbar() {
                           
                           <Link
                             href="/profile"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             👤 Profile Settings
@@ -255,7 +314,7 @@ export default function Navbar() {
                           
                           <Link
                             href="/orders"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             📋 My Orders
@@ -264,7 +323,7 @@ export default function Navbar() {
                           <div className="border-t border-gray-100 mt-2 pt-2">
                             <button
                               onClick={handleLogout}
-                              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                              className="block w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
                             >
                               🚪 Logout
                             </button>
@@ -273,16 +332,16 @@ export default function Navbar() {
                       )}
                     </div>
                   ) : (
-                    <div className="hidden sm:flex items-center gap-2">
+                    <div className="hidden sm:flex items-center gap-3">
                       <Link
                         href="/login"
-                        className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                        className="px-4 py-2 text-base font-semibold text-gray-700 hover:text-indigo-600 transition-colors"
                       >
                         Login
                       </Link>
                       <Link
                         href="/register"
-                        className="px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
+                        className="px-4 py-2.5 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl hover:from-indigo-700 hover:to-violet-700 transition-all shadow-md hover:shadow-lg"
                       >
                         Sign Up Free
                       </Link>
@@ -298,11 +357,11 @@ export default function Navbar() {
                 aria-label="Menu"
               >
                 {isMobileMenuOpen ? (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 )}
@@ -319,12 +378,12 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base"
                   autoFocus
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
+                  className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-base font-medium hover:bg-indigo-700"
                 >
                   Search
                 </button>
@@ -336,41 +395,49 @@ export default function Navbar() {
         {/* Mobile menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-200 max-h-[calc(100vh-4rem)] overflow-y-auto">
-            <div className="container mx-auto px-4 py-3 space-y-1">
-              <Link href="/" className="block py-2.5 text-gray-700 hover:text-indigo-600 font-medium">Home</Link>
-              <Link href="/digital-products" className="block py-2.5 text-gray-700 hover:text-indigo-600 font-medium">Digital Products</Link>
-              <Link href="/website-demos" className="block py-2.5 text-gray-700 hover:text-indigo-600 font-medium">Website Demos</Link>
-              <Link href="/categories" className="block py-2.5 text-gray-700 hover:text-indigo-600 font-medium">Categories</Link>
+            <div className="container mx-auto px-4 py-4 space-y-2">
+              <Link href="/" className="block py-3 text-base text-gray-700 hover:text-indigo-600 font-semibold">Home</Link>
+              <Link href="/digital-products" className="block py-3 text-base text-gray-700 hover:text-indigo-600 font-semibold">Digital Products</Link>
+              <Link href="/website-demos" className="block py-3 text-base text-gray-700 hover:text-indigo-600 font-semibold">Website Demos</Link>
+              <Link href="/categories" className="block py-3 text-base text-gray-700 hover:text-indigo-600 font-semibold">Categories</Link>
               
+              {/* Mobile More Section */}
+              <div className="py-2 border-t border-b border-gray-100 my-2 space-y-1">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-1 mb-1">More Pages</p>
+                <Link href="/blog" className="block py-2 pl-2 text-base text-gray-700 hover:text-indigo-600 font-medium">📝 Blog</Link>
+                <Link href="/about" className="block py-2 pl-2 text-base text-gray-700 hover:text-indigo-600 font-medium">ℹ️ About Us</Link>
+                <Link href="/contact" className="block py-2 pl-2 text-base text-gray-700 hover:text-indigo-600 font-medium">📞 Contact Us</Link>
+              </div>
+
               {isVendor && (
-                <Link href="/vendor/dashboard" className="block py-2.5 text-gray-700 hover:text-indigo-600 font-medium">Vendor Dashboard</Link>
+                <Link href="/vendor/dashboard" className="block py-3 text-base text-gray-700 hover:text-indigo-600 font-semibold">Vendor Dashboard</Link>
               )}
               
               {isAdmin && (
-                <Link href="/admin/dashboard" className="block py-2.5 text-gray-700 hover:text-indigo-600 font-medium">Admin Dashboard</Link>
+                <Link href="/admin/dashboard" className="block py-3 text-base text-gray-700 hover:text-indigo-600 font-semibold">Admin Dashboard</Link>
               )}
               
               {!isAuthenticated ? (
-                <div className="pt-3 space-y-2 border-t border-gray-200">
+                <div className="pt-3 space-y-3 border-t border-gray-200">
                   <Link
                     href="/login"
-                    className="block w-full text-center px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg font-medium"
+                    className="block w-full text-center px-4 py-3 text-base font-semibold text-gray-700 border border-gray-300 rounded-xl"
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
-                    className="block w-full text-center px-4 py-2.5 text-white bg-gradient-to-r from-indigo-600 to-violet-600 rounded-lg font-medium"
+                    className="block w-full text-center px-4 py-3 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl"
                   >
                     Sign Up Free
                   </Link>
                 </div>
               ) : (
-                <div className="pt-3 space-y-1 border-t border-gray-200">
-                  <Link href={getDashboardLink()} className="block py-2.5 text-gray-700 font-medium">Dashboard</Link>
-                  <Link href="/orders" className="block py-2.5 text-gray-700 font-medium">My Orders</Link>
-                  <Link href="/profile" className="block py-2.5 text-gray-700 font-medium">Profile Settings</Link>
-                  <button onClick={handleLogout} className="block w-full text-left py-2.5 text-red-600 font-medium">Logout</button>
+                <div className="pt-3 space-y-2 border-t border-gray-200">
+                  <Link href={getDashboardLink()} className="block py-3 text-base text-gray-700 font-semibold">Dashboard</Link>
+                  <Link href="/orders" className="block py-3 text-base text-gray-700 font-semibold">My Orders</Link>
+                  <Link href="/profile" className="block py-3 text-base text-gray-700 font-semibold">Profile Settings</Link>
+                  <button onClick={handleLogout} className="block w-full text-left py-3 text-base text-red-600 font-semibold">Logout</button>
                 </div>
               )}
             </div>

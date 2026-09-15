@@ -24,6 +24,7 @@ import {
 import HomeCategories from '@/components/home/HomeCategories';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import PopularProducts from '@/components/home/PopularProducts';
+import Footer from '@/components/layout/Footer'; // ফুটার কম্পোনেন্ট ইম্পোর্ট করা হলো
 
 export default function HomePage() {
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="bg-[#0a0f2c] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
@@ -204,7 +205,7 @@ export default function HomePage() {
             {testimonials.map((t, index) => (
               <div key={index} className="bg-white rounded-xl shadow-sm p-5">
                 <div className="flex gap-0.5 mb-3">
-                  {[...Array(5)].map((_, i) => (
+                  {[...Array(5)].pop() && [...Array(5)].map((_, i) => (
                     <span key={i} className="text-yellow-400 text-sm">★</span>
                   ))}
                 </div>
@@ -244,6 +245,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Footer Component */}
+      <Footer />
     </div>
   );
 }
