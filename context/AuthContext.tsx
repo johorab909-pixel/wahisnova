@@ -161,6 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [router]);
 
+<<<<<<< HEAD
 const register = useCallback(async (data: RegisterData) => {
   try {
     const response = await axios.post('/api/auth/register', {
@@ -183,6 +184,32 @@ const register = useCallback(async (data: RegisterData) => {
     throw new Error(error.response?.data?.error || 'Registration failed');
   }
 }, [router]);
+=======
+  const register = useCallback(async (data: RegisterData) => {
+    try {
+      const response = await axios.post('/api/auth/register', {
+        name: data.name.trim(),
+        email: data.email.toLowerCase().trim(),
+        password: data.password,
+        role: data.role,
+        vendorType: data.vendorType
+      });
+
+      if (response.data.success) {
+        setUser(response.data.data.user);
+        toast.success('Registration successful!');
+        
+        if (response.data.data.user.role === 'vendor') {
+          router.push('/vendor/dashboard');
+        } else {
+          router.push('/');
+        }
+      }
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Registration failed');
+    }
+  }, [router]);
+>>>>>>> ff1561bd4dcfd741532ddaff69f417bdc86a7dd8
 
   const logout = useCallback(async () => {
     try {

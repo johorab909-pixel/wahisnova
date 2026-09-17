@@ -5,7 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+<<<<<<< HEAD
 import axios from 'axios';
+=======
+>>>>>>> ff1561bd4dcfd741532ddaff69f417bdc86a7dd8
 
 type UserRole = 'customer' | 'vendor';
 type VendorType = 'digital_products' | 'website_demo' | 'both';
@@ -125,6 +128,7 @@ export default function RegisterPage() {
   };
 
   // Handle register
+<<<<<<< HEAD
 const handleRegister = async (e: React.FormEvent) => {
   e.preventDefault();
   
@@ -155,6 +159,42 @@ const handleRegister = async (e: React.FormEvent) => {
     setLoading(false);
   }
 };
+=======
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Prevent double request
+    if (isSubmitting.current || loading) {
+      return;
+    }
+    
+    // Validate
+    if (!validateForm()) {
+      return;
+    }
+    
+    // Set submitting flag
+    isSubmitting.current = true;
+    setLoading(true);
+    
+    try {
+      await register({
+        name,
+        email,
+        password,
+        role,
+        vendorType: role === 'vendor' ? vendorType : undefined
+      });
+      // Registration successful - redirect happens in register function
+    } catch (error: any) {
+      toast.error(error.message || 'Registration failed');
+    } finally {
+      // Reset submitting flag
+      isSubmitting.current = false;
+      setLoading(false);
+    }
+  };
+>>>>>>> ff1561bd4dcfd741532ddaff69f417bdc86a7dd8
 
   // If auth loading, show spinner
   if (authLoading) {

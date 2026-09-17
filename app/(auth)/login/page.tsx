@@ -85,6 +85,13 @@ function LoginForm() {
             </div>
           </div>
 
+          {/* Forgot Password Link - Password field এর নিচে */}
+          <div className="text-right">
+            <Link href="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+              Forgot Password?
+            </Link>
+          </div>
+
           <button
             type="submit"
             disabled={submitting}
@@ -98,12 +105,6 @@ function LoginForm() {
           Don't have an account?{' '}
           <Link href="/register" className="text-indigo-600 font-medium">Register</Link>
         </p>
-        {/* Forgot Password Link - Password field এর নিচে */}
-        <div className="text-right">
-          <Link href="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-            Forgot Password?
-          </Link>
-        </div>
       </div>
     </div>
   );

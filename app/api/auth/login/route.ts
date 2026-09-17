@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
     }
     
     const user = await (User as any).findOne({ email: email.toLowerCase().trim() }).select('+password');
+<<<<<<< HEAD
     // Email verified check (after password check)
     if (!user.isEmailVerified) {
       return NextResponse.json(
@@ -44,6 +45,9 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
+=======
+    
+>>>>>>> ff1561bd4dcfd741532ddaff69f417bdc86a7dd8
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
