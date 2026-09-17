@@ -5,10 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
-<<<<<<< HEAD
-import axios from 'axios';
-=======
->>>>>>> ff1561bd4dcfd741532ddaff69f417bdc86a7dd8
 
 type UserRole = 'customer' | 'vendor';
 type VendorType = 'digital_products' | 'website_demo' | 'both';
@@ -128,38 +124,6 @@ export default function RegisterPage() {
   };
 
   // Handle register
-<<<<<<< HEAD
-const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (isSubmitting.current || loading) return;
-  if (!validateForm()) return;
-  
-  isSubmitting.current = true;
-  setLoading(true);
-  
-  try {
-    const response = await axios.post('/api/auth/register', {
-      name,
-      email,
-      password,
-      role,
-      vendorType: role === 'vendor' ? vendorType : undefined
-    });
-    
-    if (response.data.success) {
-      toast.success('Verification code sent to your email!');
-      // Redirect to OTP page
-      router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
-    }
-  } catch (error: any) {
-    toast.error(error.response?.data?.error || 'Registration failed');
-  } finally {
-    isSubmitting.current = false;
-    setLoading(false);
-  }
-};
-=======
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -194,7 +158,6 @@ const handleRegister = async (e: React.FormEvent) => {
       setLoading(false);
     }
   };
->>>>>>> ff1561bd4dcfd741532ddaff69f417bdc86a7dd8
 
   // If auth loading, show spinner
   if (authLoading) {
