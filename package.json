@@ -19,10 +19,7 @@
     "lucide-react": "^1.42.0",
     "mongoose": "^9.9.5",
     "next": "16.3.4",
-<<<<<<< HEAD
     "nodemailer": "^10.0.10",
-=======
->>>>>>> ff1561bd4dcfd741532ddaff69f417bdc86a7dd8
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-hot-toast": "^2.6.0"
